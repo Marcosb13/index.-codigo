@@ -1,0 +1,83 @@
+import sqlite3
+
+# Função para conectar ao banco de dados
+def connect_db():
+    conn = sqlite3.connect('tasks.db')
+    return conn
+
+# Função para criar a tabela de tarefas
+def create_table():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS tasks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            task TEXT NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Função para adicionar uma tarefa
+def add_task(task):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO tasks (task) VALUES (?)', (task,))
+    conn.commit()
+    conn.close()
+
+# Função para visualizar as tarefas
+def view_tasks():
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM tasks')
+    tasks = cursor.fetchall()
+    conn.close()
+    return tasks
+
+# Função para remover uma tarefa
+def remove_task(task_id):
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM tasks WHERE id = ?', (task_id,))
+    conn.commit()
+    conn.close()
+
+# Função principal do programa
+def main():
+    create_table()
+
+    while True:
+        print("\nGerenciador de Tarefas")
+        print("1. Adicionar tarefa")
+        print("2. Visualizar tarefas")
+        print("3. Remover tarefa")
+        print("4. Sair")
+        
+        choice = input("Escolha uma opção: ")
+
+        if choice == '1':
+            task = input("Digite a tarefa: ")
+            add_task(task)
+            print("Tarefa adicionada!")
+        
+        elif choice == '2':
+            tasks = view_tasks()
+            print("Tarefas:")
+            for task in tasks:
+                print(f"{task[0]}: {task[1]}")
+        
+        elif choice == '3':
+            task_id = int(input("Digite o ID da tarefa para remover: "))
+            remove_task(task_id)
+            print("Tarefa removida!")
+        
+        elif choice == '4':
+            print("Saindo...")
+            break
+        
+        else:
+            print("Opção inválida! Tente novamente.")
+
+if __name__ == "__main__":
+    main()
